@@ -301,6 +301,98 @@ layout: default
 
 ---
 layout: default
+---
+
+# Large & Mid Cap Focus : Strategy 3
+
+<div class="h-[78%] flex flex-col items-center justify-center gap-6 -mt-2">
+  <div class="text-center">
+    <div class="text-sm uppercase tracking-[0.25em] text-[#303192]/70 font-bold mb-3">Key USP</div>
+    <div class="text-5xl font-extrabold text-[#303192] leading-tight">Only Large Cap + Mid Cap Stocks</div>
+    <div class="mt-3 text-lg text-gray-600">A liquid, institution-friendly variant of the quarterly signal portfolio</div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-4 w-full max-w-[850px] text-center">
+    <div class="p-4 rounded-xl bg-[#303192]/8 border border-[#303192]/15">
+      <div class="text-3xl font-extrabold text-[#303192]">20</div>
+      <div class="text-sm font-semibold text-gray-600">stocks selected quarterly</div>
+    </div>
+    <div class="p-4 rounded-xl bg-[#303192]/8 border border-[#303192]/15">
+      <div class="text-3xl font-extrabold text-[#303192]">0%</div>
+      <div class="text-sm font-semibold text-gray-600">small-cap exposure</div>
+    </div>
+    <div class="p-4 rounded-xl bg-[#303192]/8 border border-[#303192]/15">
+      <div class="text-3xl font-extrabold text-[#303192]">NIFTY 250</div>
+      <div class="text-sm font-semibold text-gray-600">large + mid cap benchmark</div>
+    </div>
+  </div>
+</div>
+
+---
+layout: default
+---
+
+# Strategy 3 · For Liquid Large & Mid Cap Exposure
+
+<div class="grid grid-cols-[2fr_1fr] gap-4 items-center h-[82%]">
+  <img src="/images/strategy3_img1.png" class="max-h-[430px] rounded-lg shadow-lg" />
+  <img src="/images/strategy3_img2.png" class="max-h-[430px] rounded-lg shadow-lg" />
+</div>
+
+---
+layout: default
+---
+
+# Strategy 3 · Performance Summary
+
+<div class="text-sm mb-3">
+Trailing Returns (%) as of <strong>February 13, 2026</strong> · Backtest period: <strong>2017–2026</strong> (9 years)
+</div>
+
+<v-click>
+<div class="mb-5">
+<p class="table-label">Trailing Returns (%)</p>
+
+| | 1 mo | 3 mo | 6 mo | 1 year | 3 years | 5 years |
+|---|---:|---:|---:|---:|---:|---:|
+| **Strategy 3** | -0.23 | 1.52 | 4.80 | 12.82 | 25.91 | 22.88 |
+| **NIFTY 250 TRI** | -0.50 | -1.82 | 4.27 | 9.35 | 19.14 | 17.01 |
+
+</div>
+</v-click>
+
+<v-click>
+<div>
+<p class="table-label">Key Metrics</p>
+
+| | Ann. Return | Ann. Risk | Max. Drawdown |
+|---|---:|---:|---:|
+| **Strategy 3** | 21.69% | 10.94% | -25.01% |
+| **NIFTY 250 TRI** | 14.39% | 16.56% | -38.55% |
+
+</div>
+</v-click>
+
+<v-click>
+<div class="mt-3 flex gap-4 justify-center text-sm">
+  <div class="callout-badge callout-green">large + mid cap only</div>
+  <div class="callout-badge callout-green">7.3% higher annualised return</div>
+  <div class="callout-badge callout-green">lower volatility</div>
+</div>
+</v-click>
+
+---
+layout: default
+---
+
+# Strategy 3 · Monthly Returns Profile
+
+<div class="flex justify-center items-center h-[75%] mt-8">
+  <img src="/images/strategy3_img4.png" class="max-h-[400px] rounded-lg shadow-lg" />
+</div>
+
+---
+layout: default
 class: text-center
 ---
 
