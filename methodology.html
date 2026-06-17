@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quarterly Signal Fund | Methodology & Approach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <style>
+    /* === THEME TOKENS: Signal design system === */
+    :root {
+      --stage-bg: #11182d;
+      --slide-bg: #1C2644;
+      --navy: #1C2644;
+      --navy-alt: #232F55;
+      --cream: #F0ECE3;
+      --cream-alt: #E6E0D4;
+      --text-warm: #E2DCD0;
+      --text-muted-dark: #8A96A8;
+      --text-hint-dark: #4E5A6E;
+      --ink: #1A2030;
+      --text-muted-light: #5A6270;
+      --text-hint-light: #9AA0A8;
+      --gold: #C8A870;
+      --rose: #C96D7C;
+      --border-dark: #2E3D5C;
+      --border-light: #CAC4B4;
+      --font-display: "Source Serif 4", "Noto Serif", Georgia, serif;
+      --font-body: "DM Sans", "Noto Sans", Verdana, sans-serif;
+      --font-mono: "IBM Plex Mono", "Courier Prime", monospace;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-slide: cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    /* === RESET === */
+    * { box-sizing: border-box; }
+
+    /* ===========================================
+     FIXED 16:9 STAGE: MANDATORY BASE STYLES
+     Slides are authored at 1920x1080 and scaled as a whole.
+     =========================================== */
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--stage-bg, #000);
+    }
+
+    .deck-viewport {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background: var(--stage-bg, #000);
+    }
+
+    .deck-stage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      transform-origin: 0 0;
+      background: var(--slide-bg, #fff);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      display: block;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      background: var(--slide-bg, #fff);
+    }
+
+    .slide.active,
+    .slide.visible {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1;
+    }
+
+    img,
+    video,
+    canvas,
+    svg {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .deck-controls {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
+    @media print {
+      html,
+      body {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck-viewport {
+        position: static;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck-stage {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none !important;
+        background: none;
+      }
+
+      .slide {
+        position: relative;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 1920px;
+        height: 1080px;
+        break-after: page;
+        page-break-after: always;
+      }
+
+      .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      .deck-controls {
+        display: none !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+      }
+    }
+
+    /* === BASE TYPOGRAPHY AND SURFACES === */
+    body { font-family: var(--font-body); color: var(--text-warm); }
+    .slide {
+      padding: 92px 144px 82px;
+      background: var(--navy);
+      color: var(--text-warm);
+    }
+    .slide.dark::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+    }
+    .slide.light {
+      background: var(--cream);
+      color: var(--ink);
+    }
+    .slide > * { position: relative; z-index: 1; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3, .headline, .stat-value, .quote {
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+    em {
+      color: var(--gold);
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 500;
+    }
+    code {
+      font-family: var(--font-mono);
+      color: inherit;
+      font-size: 0.9em;
+    }
+
+    /* === CHROME: editorial top and bottom bars === */
+    .chrome, .foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .chrome {
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-dark);
+      margin-bottom: 46px;
+    }
+    .foot {
+      position: absolute;
+      left: 144px;
+      right: 144px;
+      bottom: 54px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-dark);
+      color: var(--text-hint-dark);
+    }
+    .light .chrome { border-bottom-color: var(--border-light); }
+    .light .foot { border-top-color: var(--border-light); color: var(--text-hint-light); }
+    .light .chrome { color: var(--gold); }
+
+    /* === ANIMATION SYSTEM === */
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.65s var(--ease-out-expo), transform 0.65s var(--ease-out-expo);
+    }
+    .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+    .slide.visible .d1 { transition-delay: 0.08s; }
+    .slide.visible .d2 { transition-delay: 0.16s; }
+    .slide.visible .d3 { transition-delay: 0.24s; }
+    .slide.visible .d4 { transition-delay: 0.32s; }
+    .slide.visible .d5 { transition-delay: 0.40s; }
+
+    /* === LAYOUT PRIMITIVES === */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 98px 144px 86px;
+    }
+    .cover-title {
+      font-size: 178px;
+      line-height: 0.88;
+      max-width: 1220px;
+    }
+    .cover-subtitle {
+      font-size: 42px;
+      line-height: 1.34;
+      max-width: 960px;
+      color: var(--text-muted-dark);
+      margin-top: 34px;
+    }
+    .light .cover-subtitle { color: var(--text-muted-light); }
+    .kicker {
+      font-family: var(--font-mono);
+      color: var(--gold);
+      font-size: 14px;
+      line-height: 1.3;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .gold-rule { width: 42px; height: 1px; background: var(--gold); margin: 0 0 28px; }
+    .section-title {
+      font-size: 84px;
+      line-height: 1.04;
+      max-width: 1200px;
+    }
+    .lead {
+      font-size: 28px;
+      line-height: 1.55;
+      color: var(--text-muted-dark);
+      max-width: 1000px;
+    }
+    .light .lead { color: var(--text-muted-light); }
+    .body {
+      height: 746px;
+      display: grid;
+      gap: 36px;
+      align-content: start;
+    }
+    .two-col, .two-col-wide, .three-col, .four-col { display: grid; gap: 36px; }
+    .two-col { grid-template-columns: 1fr 1fr; }
+    .two-col-wide { grid-template-columns: 1.18fr 0.82fr; }
+    .three-col { grid-template-columns: repeat(3, 1fr); }
+    .four-col { grid-template-columns: repeat(4, 1fr); }
+    .stack { display: grid; gap: 28px; }
+    .tight { gap: 18px; }
+    .panel {
+      border-top: 1px solid var(--border-dark);
+      padding-top: 24px;
+    }
+    .light .panel { border-top-color: var(--border-light); }
+    .panel.full {
+      border: 1px solid var(--border-dark);
+      padding: 30px;
+    }
+    .light .panel.full { border-color: var(--border-light); }
+    .panel h3, .card-title {
+      font-size: 34px;
+      line-height: 1.18;
+      margin-bottom: 14px;
+    }
+    .panel p, .panel li, .card-body {
+      font-size: 22px;
+      line-height: 1.48;
+      color: var(--text-muted-dark);
+    }
+    .light .panel p, .light .panel li, .light .card-body { color: var(--text-muted-light); }
+    .dash-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 14px;
+    }
+    .dash-list li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+    }
+    .dash-list li::before {
+      content: "-";
+      color: var(--gold);
+      font-family: var(--font-mono);
+    }
+    .tag {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 7px 12px 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-right: 10px;
+    }
+    .quote {
+      font-size: 64px;
+      line-height: 1.18;
+      max-width: 1340px;
+    }
+    .quote-small { font-size: 46px; line-height: 1.25; }
+
+    /* === DATA AND DIAGRAM COMPONENTS === */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 42px;
+    }
+    .stat-card {
+      border-top: 1px solid var(--border-dark);
+      padding-top: 28px;
+    }
+    .light .stat-card { border-top-color: var(--border-light); }
+    .stat-value {
+      font-size: 92px;
+      color: var(--gold);
+      line-height: 0.92;
+      margin-bottom: 14px;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-hint-dark);
+    }
+    .light .stat-label { color: var(--text-hint-light); }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: stretch;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .flow.six { grid-template-columns: repeat(6, 1fr); }
+    .flow-step {
+      min-height: 170px;
+      border-top: 2px solid var(--gold);
+      padding: 26px 18px;
+      background: rgba(255,255,255,0.025);
+      position: relative;
+    }
+    .light .flow-step { background: rgba(28,38,68,0.035); }
+    .flow-step:not(:last-child)::after {
+      content: "\2192";
+      position: absolute;
+      right: -19px;
+      top: 62px;
+      color: var(--gold);
+      font-family: var(--font-mono);
+      z-index: 2;
+    }
+    .flow-num {
+      font-family: var(--font-mono);
+      color: var(--gold);
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      margin-bottom: 18px;
+    }
+    .flow-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      line-height: 1.12;
+    }
+    .timeline {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      position: relative;
+      padding-left: 30px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 7px;
+      bottom: 8px;
+      width: 1px;
+      background: var(--border-dark);
+    }
+    .light .timeline::before { background: var(--border-light); }
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 140px;
+      gap: 24px;
+      align-items: start;
+      position: relative;
+      padding-bottom: 6px;
+    }
+    .timeline-row::before {
+      content: "";
+      position: absolute;
+      left: -30px;
+      top: 6px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+    .timeline-date, .mono {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .timeline-text {
+      font-size: 22px;
+      line-height: 1.42;
+      color: var(--text-muted-dark);
+    }
+    .light .timeline-text { color: var(--text-muted-light); }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 20px;
+      line-height: 1.34;
+    }
+    .table th {
+      font-family: var(--font-mono);
+      color: var(--gold);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 0 18px 14px 0;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .light .table th { border-bottom-color: var(--border-light); }
+    .table td {
+      padding: 16px 18px 16px 0;
+      border-bottom: 1px solid rgba(46,61,92,0.72);
+      color: var(--text-muted-dark);
+    }
+    .light .table td { border-bottom-color: var(--border-light); color: var(--text-muted-light); }
+    .table strong { color: inherit; font-weight: 500; }
+    .formula {
+      font-family: var(--font-display);
+      font-size: 34px;
+      color: var(--gold);
+      padding: 26px 0;
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .light .formula { border-color: var(--border-light); }
+    .formula-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 30px 0;
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .light .formula-row { border-color: var(--border-light); }
+    .formula-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: var(--gold);
+    }
+    .formula-item:first-child { border-right: 1px solid var(--border-dark); }
+    .light .formula-item:first-child { border-right-color: var(--border-light); }
+    .formula-name {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-hint-light);
+    }
+    .dark .formula-name { color: var(--text-hint-dark); }
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      line-height: 1.25;
+    }
+    .frac .num { padding: 0 14px 4px; border-bottom: 1.5px solid currentColor; }
+    .frac .den { padding-top: 4px; }
+    .formula-item sub {
+      font-size: 0.55em;
+      font-family: var(--font-mono);
+    }
+    .demo-callout {
+      border: 1px solid var(--gold);
+      padding: 28px 34px;
+      font-family: var(--font-mono);
+      color: var(--gold);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    .mini-map {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .mini-card {
+      border-top: 1px solid var(--border-dark);
+      padding-top: 20px;
+      min-height: 138px;
+    }
+    .light .mini-card { border-top-color: var(--border-light); }
+    .mini-card .card-title { font-size: 28px; }
+    .mini-card .card-body { font-size: 19px; line-height: 1.45; }
+    .large-number {
+      font-family: var(--font-display);
+      color: var(--gold);
+      font-size: 150px;
+      line-height: 0.9;
+    }
+
+    /* === DECK-SPECIFIC COMPONENTS === */
+    .innovation-card {
+      border: 1px solid rgba(200,168,112,0.52);
+      background: rgba(200,168,112,0.08);
+      padding: 28px 34px;
+    }
+    .light .innovation-card {
+      background: rgba(28,38,68,0.035);
+      border-color: var(--border-light);
+    }
+    .innovation-card h3 {
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 15px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin: 0 0 14px;
+    }
+    .innovation-card p {
+      font-size: 24px;
+      line-height: 1.45;
+      color: var(--text-muted-dark);
+    }
+    .light .innovation-card p { color: var(--text-muted-light); }
+    .window-board {
+      border: 1px solid var(--border-light);
+      padding: 34px 38px 32px;
+      background: rgba(255,255,255,0.36);
+    }
+    .legend {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      margin: 0 0 24px 86px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted-light);
+    }
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .swatch {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      background: var(--navy);
+    }
+    .swatch.prediction { background: var(--rose); }
+    .axis {
+      position: relative;
+      height: 34px;
+      margin-left: 86px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .axis span {
+      position: absolute;
+      bottom: 8px;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-hint-light);
+    }
+    .window-row {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      align-items: center;
+      gap: 16px;
+      height: 58px;
+    }
+    .window-label {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .window-track {
+      position: relative;
+      height: 34px;
+    }
+    .train-bar,
+    .predict-bar {
+      position: absolute;
+      inset-block: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cream);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+    }
+    .train-bar { background: var(--navy); }
+    .predict-bar { background: var(--rose); font-weight: 600; }
+    .ellipsis {
+      font-family: var(--font-display);
+      color: var(--text-hint-light);
+      font-size: 42px;
+      line-height: 1;
+      text-align: center;
+      letter-spacing: 0.2em;
+    }
+    .chart-card {
+      height: 610px;
+      border: 1px solid var(--border-light);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 42px;
+      box-shadow: 0 18px 40px rgba(26,32,48,0.08);
+    }
+    .chart-card img {
+      width: 1420px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* Compact variants keep denser early slides inside the fixed 16:9 canvas. */
+    .tight-slide .body { gap: 22px; }
+    .tight-slide .section-title {
+      font-size: 66px;
+      line-height: 1.02;
+      max-width: 1480px;
+    }
+    .tight-slide .lead {
+      font-size: 24px;
+      line-height: 1.42;
+    }
+    .tight-slide .flow-step {
+      min-height: 132px;
+      padding: 20px 16px;
+    }
+    .tight-slide .flow-num { margin-bottom: 12px; }
+    .tight-slide .flow-title { font-size: 24px; }
+    .tight-slide .panel {
+      padding-top: 18px;
+    }
+    .tight-slide .panel h3,
+    .tight-slide .card-title {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+    .tight-slide .panel p,
+    .tight-slide .panel li,
+    .tight-slide .card-body {
+      font-size: 19px;
+      line-height: 1.38;
+    }
+    .tight-slide .dash-list { gap: 10px; }
+    .tight-slide .innovation-card {
+      padding: 22px 28px;
+    }
+    .tight-slide .innovation-card p {
+      font-size: 20px;
+      line-height: 1.36;
+    }
+    .rolling-slide .section-title { font-size: 62px; }
+    .rolling-slide .lead { font-size: 23px; }
+    .rolling-slide .window-board {
+      padding: 24px 32px 22px;
+      background: var(--cream);
+      border-color: var(--border-light);
+    }
+    .rolling-slide .legend {
+      margin: 0 0 14px 86px;
+      font-size: 12px;
+    }
+    .rolling-slide .axis { height: 28px; }
+    .rolling-slide .window-row { height: 45px; }
+    .rolling-slide .window-row.compact-gap { height: 30px; }
+    .rolling-slide .window-track { height: 30px; }
+    .rolling-slide .train-bar,
+    .rolling-slide .predict-bar {
+      font-size: 11px;
+    }
+    .rolling-slide .innovation-card {
+      padding: 16px 24px;
+    }
+    .feature-slide .section-title {
+      font-size: 60px;
+      max-width: 1500px;
+    }
+    .feature-slide .chart-card {
+      height: 510px;
+      padding: 28px;
+    }
+    .feature-slide .chart-card img { width: 1280px; }
+
+    /* === NAVIGATION AND EDITING UI === */
+    .deck-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border: 1px solid rgba(200,168,112,0.42);
+      background: rgba(26,32,48,0.72);
+      color: var(--text-warm);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      backdrop-filter: blur(10px);
+    }
+    .deck-controls button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+    .progress-track {
+      width: 190px;
+      height: 1px;
+      background: rgba(226,220,208,0.22);
+    }
+    .progress-fill {
+      height: 1px;
+      width: 0;
+      background: var(--gold);
+      transition: width 0.35s var(--ease-slide);
+    }
+    .edit-hotzone {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 84px;
+      height: 84px;
+      z-index: 10000;
+      cursor: pointer;
+    }
+    .edit-toggle {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      opacity: 0;
+      pointer-events: none;
+      border: 1px solid rgba(200,168,112,0.6);
+      background: rgba(26,32,48,0.86);
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      z-index: 10001;
+      transition: opacity 0.3s ease;
+    }
+    .edit-toggle.show, .edit-toggle.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    [contenteditable="true"] {
+      outline: 1px dashed var(--gold);
+      outline-offset: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="deck-viewport" aria-label="Quarterly Signal Fund methodology deck">
+    <main class="deck-stage" id="deckStage">
+
+      <!-- === SLIDE 01: COVER === -->
+      <section class="slide dark cover active visible" data-title="Cover">
+        <div>
+          <div class="kicker reveal d1">Wealth management portfolios / methodology</div>
+          <div class="gold-rule reveal d2"></div>
+          <h1 class="cover-title reveal d3" data-editable>Quarterly Signal <em>Fund</em></h1>
+          <p class="cover-subtitle reveal d4" data-editable>Wealth Management Portfolios - Methodology &amp; Approach</p>
+        </div>
+        <div class="foot reveal d5"><span>ML stock selection / exits / reporting</span><span>June 2026</span></div>
+      </section>
+
+      <!-- === SLIDE 02: PROBLEM STATEMENT === -->
+      <section class="slide light tight-slide" data-title="Problem">
+        <div class="chrome"><span>The Mandate</span><span>02 / 09</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">Where we start</div>
+            <h2 class="section-title" data-editable>Build a long-only portfolio that <em>beats the index</em> and feels credible to clients.</h2>
+            <p class="lead" style="margin-top: 22px;">Three things have to be true at once, and the rest of this deck shows how each one is delivered.</p>
+          </div>
+          <div class="stat-grid reveal d2">
+            <div class="stat-card">
+              <div class="stat-value">01</div>
+              <div class="card-title">Performance</div>
+              <p class="card-body">Select stocks each quarter using ML probability scores and measure excess return against an index.</p>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">02</div>
+              <div class="card-title">Risk Control</div>
+              <p class="card-body">Make exits, drawdown, cash drag, and risk behavior first-class parts of the simulation.</p>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">03</div>
+              <div class="card-title">Experience</div>
+              <p class="card-body">Give clients a clear explanation of what was bought, how it behaved, and why it exited.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Portfolio goal</span></div>
+      </section>
+
+      <!-- === SLIDE 03: OVERVIEW OF APPROACH === -->
+      <section class="slide dark tight-slide" data-title="Overview of Approach">
+        <div class="chrome"><span>The Approach</span><span>03 / 09</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">From mandate to method</div>
+            <h2 class="section-title">One quarterly pipeline turns public filings into <em>risk-aware stock selection</em>.</h2>
+            <p class="lead" style="margin-top: 18px;">The stages below run in order every quarter; the next slides open up each one.</p>
+          </div>
+          <div class="flow reveal d2" style="margin-top: 0;">
+            <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Quarterly Filings</div></div>
+            <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">ML Signal</div></div>
+            <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">Volatility Scoring</div></div>
+            <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Portfolio</div></div>
+            <div class="flow-step"><div class="flow-num">05</div><div class="flow-title">ATR / S&amp;R Exit</div></div>
+          </div>
+          <div class="two-col reveal d3">
+            <div class="panel">
+              <h3>Operating Rules</h3>
+              <ul class="dash-list">
+                <li>ML models extract signal from quarterly results posted by NIFTY 500 companies.</li>
+                <li>Positions enter across a 3-day entry phase every quarter after SEBI filing deadlines.</li>
+                <li>Model scores combine with historical volatility to build portfolios that emphasize lower drawdowns.</li>
+                <li>Exit strategy uses take-profit and stop-loss rules to manage the quarter after entry.</li>
+              </ul>
+            </div>
+            <div class="innovation-card">
+              <h3>Key Innovation</h3>
+              <p>The model predicts <em>relative</em> outperformance versus the market, not absolute returns.</p>
+              <p style="margin-top: 18px;">That creates a fundamentals-for-entry, technicals-for-exit approach designed to limit downside.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Approach</span></div>
+      </section>
+
+      <!-- === SLIDE 04: SEBI ALIGNED QUARTERS === -->
+      <section class="slide light" data-title="Quarter timing">
+        <div class="chrome"><span>Inside the Approach &middot; Entry</span><span>04 / 09</span></div>
+        <div class="body two-col-wide">
+          <div class="reveal d1">
+            <div class="kicker">First stage &middot; When we act</div>
+            <h2 class="section-title">It all starts with the filings: we enter one day after each <em>SEBI deadline</em>.</h2>
+            <p class="lead" style="margin-top:26px;">That keeps target creation, backtesting, and live inference aligned around the same post-result entry window.</p>
+          </div>
+          <div class="panel full reveal d2">
+            <table class="table">
+              <thead><tr><th>Code</th><th>Entry start</th><th>Exit</th><th>Reason</th></tr></thead>
+              <tbody>
+                <tr><td><code>YYYY02</code></td><td>Feb 15</td><td>May 30</td><td>After Q3 deadline</td></tr>
+                <tr><td><code>YYYY05</code></td><td>May 31</td><td>Aug 14</td><td>After Q4 deadline</td></tr>
+                <tr><td><code>YYYY08</code></td><td>Aug 15</td><td>Nov 14</td><td>After Q1 deadline</td></tr>
+                <tr><td><code>YYYY11</code></td><td>Nov 15</td><td>Feb 14</td><td>After Q2 deadline</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Filing cycle</span></div>
+      </section>
+
+      <!-- === SLIDE 05: ROLLING WINDOW TRAINING === -->
+      <section class="slide dark tight-slide rolling-slide" data-title="Rolling Window Training">
+        <div class="chrome"><span>Inside the Approach &middot; The Model</span><span>05 / 09</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">The ML signal &middot; How it is learned</div>
+            <h2 class="section-title">Behind that signal, a 10-year window slides forward <em>one prediction year at a time</em>.</h2>
+            <p class="lead" style="margin-top: 22px;">Each window trains only on history available before the prediction year, so there is no future leakage.</p>
+          </div>
+          <div class="window-board reveal d2">
+            <div class="legend">
+              <span><i class="swatch"></i> Training Window (10 yrs)</span>
+              <span><i class="swatch prediction"></i> Prediction Year</span>
+            </div>
+            <div class="axis">
+              <span style="left: 2.63%;">2007</span>
+              <span style="left: 18.42%;">'10</span>
+              <span style="left: 34.21%;">'13</span>
+              <span style="left: 50%;">'16</span>
+              <span style="left: 65.79%;">'19</span>
+              <span style="left: 81.58%;">'22</span>
+              <span style="left: 97.37%;">2025</span>
+            </div>
+            <div class="window-row">
+              <div class="window-label">Set 1</div>
+              <div class="window-track">
+                <div class="train-bar" style="left: 0%; width: 52.63%;">2007 - 2016</div>
+                <div class="predict-bar" style="left: 52.63%; width: 5.26%;">'17</div>
+              </div>
+            </div>
+            <div class="window-row">
+              <div class="window-label">Set 2</div>
+              <div class="window-track">
+                <div class="train-bar" style="left: 5.26%; width: 52.63%;">2008 - 2017</div>
+                <div class="predict-bar" style="left: 57.89%; width: 5.26%;">'18</div>
+              </div>
+            </div>
+            <div class="window-row">
+              <div class="window-label">Set 3</div>
+              <div class="window-track">
+                <div class="train-bar" style="left: 10.53%; width: 52.63%;">2009 - 2018</div>
+                <div class="predict-bar" style="left: 63.16%; width: 5.26%;">'19</div>
+              </div>
+            </div>
+            <div class="window-row compact-gap">
+              <div class="window-label"></div>
+              <div class="ellipsis">...</div>
+            </div>
+            <div class="window-row">
+              <div class="window-label">Set 9</div>
+              <div class="window-track">
+                <div class="train-bar" style="left: 42.11%; width: 52.63%;">2015 - 2024</div>
+                <div class="predict-bar" style="left: 94.74%; width: 5.26%;">'25</div>
+              </div>
+            </div>
+          </div>
+          <div class="innovation-card reveal d3">
+            <h3>Result</h3>
+            <p>Each window produces probability scores for every NIFTY 500 stock in the prediction year.</p>
+          </div>
+        </div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Rolling window</span></div>
+      </section>
+
+      <!-- === SLIDE 06: FEATURES USED TO EXTRACT SIGNAL === -->
+      <section class="slide light tight-slide feature-slide" data-title="Features used to Extract Signal">
+        <div class="chrome"><span>Inside the Approach &middot; Model Inputs</span><span>06 / 09</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">The ML signal &middot; What the model reads</div>
+            <h2 class="section-title">Inside each window, the model reads <em>these feature categories</em>.</h2>
+            <p class="lead" style="margin-top: 22px;">Feature distribution across categories - quality, momentum, profitability, efficiency, growth, and volatility.</p>
+          </div>
+          <div class="chart-card reveal d2">
+            <img src="public/images/slide3_img0.png" alt="Feature distribution across categories">
+          </div>
+        </div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Feature set</span></div>
+      </section>
+
+      <!-- === SLIDE 07: EXIT STRATEGY WITHOUT REGIME EXIT === -->
+      <section class="slide dark" data-title="Exit importance">
+        <div class="chrome"><span>Inside the Approach &middot; Exits</span><span>07 / 09</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">After entry &middot; Managing the quarter</div>
+            <h2 class="section-title">Once names are owned, exits decide <em>how the quarter is survived</em>.</h2>
+          </div>
+          <div class="three-col reveal d2" style="gap: 42px;">
+            <div class="stat-card">
+              <div class="stat-value">TP</div>
+              <div class="card-title">Take profit</div>
+              <p class="card-body">Lock gains when a stock reaches planned upside.</p>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">SL</div>
+              <div class="card-title">Stop loss</div>
+              <p class="card-body">Cut failed ideas before they dominate the quarter.</p>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">T</div>
+              <div class="card-title">Time exit</div>
+              <p class="card-body">Refresh at the next result-filing cycle.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Trade lifecycle</span></div>
+      </section>
+
+      <!-- === SLIDE 08: SEARCH SPACE PROBLEM === -->
+      <section class="slide light" data-title="Search space">
+        <div class="chrome"><span>Making It Robust &middot; Tuning</span><span>08 / 09</span></div>
+        <div class="body two-col-wide">
+          <div class="reveal d1">
+            <div class="kicker">Tying the pipeline together</div>
+            <div class="large-number" style="color: var(--navy);">9.8M</div>
+            <p class="lead" style="margin-top:28px;">Every stage above carries its own levers. Combined, they make a search space too large to tune by hand - even five choices across ten parameters reach millions.</p>
+            <div class="demo-callout" style="margin-top:30px;">It is therefore machine driven - an optimizer runs through the trials, with a human in the loop ensuring stability.</div>
+          </div>
+          <div class="stack reveal d2">
+            <div class="panel">
+              <h3>Selection levers</h3>
+              <p>Top-k, category counts, weighting schemes, probability thresholds, sorting choices.</p>
+            </div>
+            <div class="panel">
+              <h3>Exit levers</h3>
+              <p>Flat, tiered, ATR, pivot, independent TP/SL modes and mode-specific parameters.</p>
+            </div>
+            <div class="panel">
+              <h3>Market levers</h3>
+              <p>Index moving averages, risk thresholds, volatility adjustments, risk-free cash behavior.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Parameter space</span></div>
+      </section>
+
+      <!-- === SLIDE 09: CLOSE === -->
+      <section class="slide dark cover" data-title="Close">
+        <div>
+          <div class="kicker reveal d1">Thank you</div>
+          <div class="gold-rule reveal d2"></div>
+          <h2 class="cover-title reveal d3" style="font-size:150px;" data-editable>Quarterly Signal <em>Fund</em></h2>
+          <p class="cover-subtitle reveal d4" data-editable>Methodology built for repeatable, explainable wealth management portfolios.</p>
+        </div>
+        <div class="foot reveal d5"><span>Quarterly Signal Fund</span><span>Wealth Management Portfolios</span></div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="deck-controls" aria-label="Presentation controls">
+    <button id="prevBtn" type="button" aria-label="Previous slide">&lsaquo;</button>
+    <span id="slideCounter">01 / 09</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <button id="nextBtn" type="button" aria-label="Next slide">&rsaquo;</button>
+  </div>
+  <div class="edit-hotzone" title="Edit mode"></div>
+  <button class="edit-toggle" id="editToggle" type="button">Edit</button>
+
+  <script>
+    /* === PRESENTATION CONTROLLER: scaling, navigation, progress === */
+    class SlidePresentation {
+      constructor() {
+        this.slides = Array.from(document.querySelectorAll(".slide"));
+        this.currentSlide = 0;
+        this.stage = document.getElementById("deckStage");
+        this.counter = document.getElementById("slideCounter");
+        this.progress = document.getElementById("progressFill");
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        document.getElementById("prevBtn").addEventListener("click", () => this.prev());
+        document.getElementById("nextBtn").addEventListener("click", () => this.next());
+        const requested = this.slideIndexFromHash();
+        this.showSlide(requested);
+        window.addEventListener("hashchange", () => this.showSlide(this.slideIndexFromHash()));
+      }
+
+      setupStageScale() {
+        const scale = () => {
+          const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+          const x = (window.innerWidth - 1920 * factor) / 2;
+          const y = (window.innerHeight - 1080 * factor) / 2;
+          this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+        };
+        scale();
+        window.addEventListener("resize", scale);
+      }
+
+      setupKeyboardNav() {
+        document.addEventListener("keydown", (event) => {
+          if (event.target && event.target.getAttribute("contenteditable") === "true") return;
+          const forward = ["ArrowRight", "ArrowDown", " ", "PageDown"];
+          const back = ["ArrowLeft", "ArrowUp", "PageUp"];
+          if (forward.includes(event.key)) { event.preventDefault(); this.next(); }
+          if (back.includes(event.key)) { event.preventDefault(); this.prev(); }
+          if (event.key === "Home") { event.preventDefault(); this.showSlide(0); }
+          if (event.key === "End") { event.preventDefault(); this.showSlide(this.slides.length - 1); }
+        });
+      }
+
+      setupTouchNav() {
+        let startX = 0;
+        let startY = 0;
+        window.addEventListener("touchstart", (event) => {
+          startX = event.touches[0].clientX;
+          startY = event.touches[0].clientY;
+        }, { passive: true });
+        window.addEventListener("touchend", (event) => {
+          const dx = event.changedTouches[0].clientX - startX;
+          const dy = event.changedTouches[0].clientY - startY;
+          if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy)) {
+            dx < 0 ? this.next() : this.prev();
+          }
+        }, { passive: true });
+      }
+
+      setupWheelNav() {
+        let lastWheel = 0;
+        window.addEventListener("wheel", (event) => {
+          const now = Date.now();
+          if (now - lastWheel < 620) return;
+          if (Math.abs(event.deltaY) > 30) {
+            event.deltaY > 0 ? this.next() : this.prev();
+            lastWheel = now;
+          }
+        }, { passive: true });
+      }
+
+      next() { this.showSlide(this.currentSlide + 1); }
+      prev() { this.showSlide(this.currentSlide - 1); }
+
+      slideIndexFromHash() {
+        const match = window.location.hash.match(/slide-(\d+)/);
+        if (!match) return 0;
+        return Number.parseInt(match[1], 10) - 1;
+      }
+
+      showSlide(index) {
+        this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+        this.slides.forEach((slide, i) => {
+          slide.classList.toggle("active", i === this.currentSlide);
+          slide.classList.toggle("visible", i === this.currentSlide);
+        });
+        const current = String(this.currentSlide + 1).padStart(2, "0");
+        const total = String(this.slides.length).padStart(2, "0");
+        this.counter.textContent = `${current} / ${total}`;
+        this.progress.style.width = `${((this.currentSlide + 1) / this.slides.length) * 100}%`;
+        window.location.hash = `slide-${this.currentSlide + 1}`;
+      }
+    }
+
+    /* === INLINE EDITOR: local draft text edits === */
+    class InlineEditor {
+      constructor() {
+        this.isActive = false;
+        this.editables = Array.from(document.querySelectorAll("[data-editable]"));
+        this.key = "qsf-methodology-html-pitchdeck-edits";
+        this.load();
+      }
+
+      toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.getElementById("editToggle").classList.toggle("active", this.isActive);
+        this.editables.forEach((el, index) => {
+          el.setAttribute("contenteditable", this.isActive ? "true" : "false");
+          if (this.isActive) {
+            el.addEventListener("input", () => this.save(), { once: false });
+            el.dataset.editIndex = String(index);
+          }
+        });
+      }
+
+      save() {
+        const data = this.editables.map(el => el.innerHTML);
+        localStorage.setItem(this.key, JSON.stringify(data));
+      }
+
+      load() {
+        try {
+          const raw = localStorage.getItem(this.key);
+          if (!raw) return;
+          const data = JSON.parse(raw);
+          this.editables.forEach((el, i) => {
+            if (typeof data[i] === "string") el.innerHTML = data[i];
+          });
+        } catch (_) {
+          localStorage.removeItem(this.key);
+        }
+      }
+    }
+
+    const deck = new SlidePresentation();
+    const editor = new InlineEditor();
+
+    /* === EDIT TOGGLE HOTZONE: hover, click, E key === */
+    const hotzone = document.querySelector(".edit-hotzone");
+    const editToggle = document.getElementById("editToggle");
+    let hideTimeout = null;
+    hotzone.addEventListener("mouseenter", () => {
+      clearTimeout(hideTimeout);
+      editToggle.classList.add("show");
+    });
+    hotzone.addEventListener("mouseleave", () => {
+      hideTimeout = setTimeout(() => {
+        if (!editor.isActive) editToggle.classList.remove("show");
+      }, 400);
+    });
+    editToggle.addEventListener("mouseenter", () => clearTimeout(hideTimeout));
+    editToggle.addEventListener("mouseleave", () => {
+      hideTimeout = setTimeout(() => {
+        if (!editor.isActive) editToggle.classList.remove("show");
+      }, 400);
+    });
+    hotzone.addEventListener("click", () => editor.toggleEditMode());
+    editToggle.addEventListener("click", () => editor.toggleEditMode());
+    document.addEventListener("keydown", (event) => {
+      if ((event.key === "e" || event.key === "E") && event.target.getAttribute("contenteditable") !== "true") {
+        editor.toggleEditMode();
+      }
+    });
+  </script>
+</body>
+</html>

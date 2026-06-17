@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>alphaBT | Quarterly Equity Strategy Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <style>
+    /* === THEME TOKENS: Signal design system === */
+    :root {
+      --stage-bg: #11182d;
+      --slide-bg: #1C2644;
+      --navy: #1C2644;
+      --navy-alt: #232F55;
+      --cream: #F0ECE3;
+      --cream-alt: #E6E0D4;
+      --text-warm: #E2DCD0;
+      --text-muted-dark: #8A96A8;
+      --text-hint-dark: #4E5A6E;
+      --ink: #1A2030;
+      --text-muted-light: #5A6270;
+      --text-hint-light: #9AA0A8;
+      --gold: #C8A870;
+      --border-dark: #2E3D5C;
+      --border-light: #CAC4B4;
+      --font-display: "Source Serif 4", "Noto Serif", Georgia, serif;
+      --font-body: "DM Sans", "Noto Sans", Verdana, sans-serif;
+      --font-mono: "IBM Plex Mono", "Courier Prime", monospace;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-slide: cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    /* === RESET === */
+    * { box-sizing: border-box; }
+
+    /* ===========================================
+     FIXED 16:9 STAGE: MANDATORY BASE STYLES
+     Include this ENTIRE file in every presentation.
+     Slides are authored at 1920×1080 and scaled as a whole.
+     =========================================== */
+
+    /* 1. Lock the browser viewport */
+    html,
+    body {
+     width: 100%;
+     height: 100%;
+     margin: 0;
+     overflow: hidden;
+     background: var(--stage-bg, #000);
+    }
+
+    /* 2. Full-window deck viewport */
+    .deck-viewport {
+     position: fixed;
+     inset: 0;
+     overflow: hidden;
+     background: var(--stage-bg, #000);
+    }
+
+    /* 3. Fixed 16:9 design canvas.
+     JavaScript sets transform: translate(...) scale(...). */
+    .deck-stage {
+     position: absolute;
+     left: 0;
+     top: 0;
+     width: 1920px;
+     height: 1080px;
+     overflow: hidden;
+     transform-origin: 0 0;
+     background: var(--slide-bg, #fff);
+    }
+
+    /* 4. Slides stack inside the fixed stage.
+     Content must be laid out at 1920×1080, not reflowed per device. */
+    .slide {
+     position: absolute;
+     inset: 0;
+     width: 1920px;
+     height: 1080px;
+     overflow: hidden;
+     display: block;
+     visibility: hidden;
+     opacity: 0;
+     pointer-events: none;
+     background: var(--slide-bg, #fff);
+    }
+
+    .slide.active,
+    .slide.visible {
+     visibility: visible;
+     opacity: 1;
+     pointer-events: auto;
+     z-index: 1;
+    }
+
+    /* 5. Keep media inside authored slide bounds */
+    img,
+    video,
+    canvas,
+    svg {
+     max-width: 100%;
+     max-height: 100%;
+    }
+
+    /* 6. Presentation chrome stays outside the slide design system */
+    .deck-controls {
+     position: fixed;
+     left: 50%;
+     bottom: 22px;
+     transform: translateX(-50%);
+     z-index: 1000;
+    }
+
+    /* 7. Print one fixed-size slide per page */
+    @media print {
+     html,
+     body {
+     width: 1920px;
+     height: auto;
+     overflow: visible;
+     background: #fff;
+     }
+
+     .deck-viewport {
+     position: static;
+     overflow: visible;
+     background: #fff;
+     }
+
+     .deck-stage {
+     position: static;
+     width: auto;
+     height: auto;
+     transform: none !important;
+     background: none;
+     }
+
+     .slide {
+     position: relative;
+     display: block !important;
+     visibility: visible !important;
+     opacity: 1 !important;
+     pointer-events: auto !important;
+     width: 1920px;
+     height: 1080px;
+     break-after: page;
+     page-break-after: always;
+     }
+
+     .slide:last-child {
+     break-after: auto;
+     page-break-after: auto;
+     }
+
+     .deck-controls {
+     display: none !important;
+     }
+    }
+
+    /* 8. Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+     *,
+     *::before,
+     *::after {
+     animation-duration: 0.01ms !important;
+     transition-duration: 0.2s !important;
+     }
+    }
+
+    /* === BASE TYPOGRAPHY AND SURFACES === */
+    body { font-family: var(--font-body); color: var(--text-warm); }
+    .slide {
+      padding: 92px 144px 82px;
+      background: var(--navy);
+      color: var(--text-warm);
+    }
+    .slide.dark::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+    }
+    .slide.light {
+      background: var(--cream);
+      color: var(--ink);
+    }
+    .slide > * { position: relative; z-index: 1; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3, .headline, .stat-value, .quote {
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+    em {
+      color: var(--gold);
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 500;
+    }
+    code {
+      font-family: var(--font-mono);
+      color: inherit;
+      font-size: 0.9em;
+    }
+
+    /* === CHROME: editorial top and bottom bars === */
+    .chrome, .foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .chrome {
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-dark);
+      margin-bottom: 46px;
+    }
+    .foot {
+      position: absolute;
+      left: 144px;
+      right: 144px;
+      bottom: 54px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-dark);
+      color: var(--text-hint-dark);
+    }
+    .light .chrome { border-bottom-color: var(--border-light); }
+    .light .foot { border-top-color: var(--border-light); color: var(--text-hint-light); }
+    .light .chrome { color: var(--gold); }
+
+    /* === ANIMATION SYSTEM === */
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.65s var(--ease-out-expo), transform 0.65s var(--ease-out-expo);
+    }
+    .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+    .slide.visible .d1 { transition-delay: 0.08s; }
+    .slide.visible .d2 { transition-delay: 0.16s; }
+    .slide.visible .d3 { transition-delay: 0.24s; }
+    .slide.visible .d4 { transition-delay: 0.32s; }
+    .slide.visible .d5 { transition-delay: 0.40s; }
+
+    /* === LAYOUT PRIMITIVES === */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 98px 144px 86px;
+    }
+    .cover-title {
+      font-size: 190px;
+      line-height: 0.88;
+      max-width: 1120px;
+    }
+    .cover-subtitle {
+      font-size: 42px;
+      line-height: 1.34;
+      max-width: 900px;
+      color: var(--text-muted-dark);
+      margin-top: 34px;
+    }
+    .light .cover-subtitle { color: var(--text-muted-light); }
+    .kicker {
+      font-family: var(--font-mono);
+      color: var(--gold);
+      font-size: 14px;
+      line-height: 1.3;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .gold-rule { width: 42px; height: 1px; background: var(--gold); margin: 0 0 28px; }
+    .section-title {
+      font-size: 84px;
+      line-height: 1.04;
+      max-width: 1200px;
+    }
+    .lead {
+      font-size: 28px;
+      line-height: 1.55;
+      color: var(--text-muted-dark);
+      max-width: 1000px;
+    }
+    .light .lead { color: var(--text-muted-light); }
+    .body {
+      height: 746px;
+      display: grid;
+      gap: 36px;
+      align-content: start;
+    }
+    .two-col, .two-col-wide, .three-col, .four-col { display: grid; gap: 36px; }
+    .two-col { grid-template-columns: 1fr 1fr; }
+    .two-col-wide { grid-template-columns: 1.18fr 0.82fr; }
+    .three-col { grid-template-columns: repeat(3, 1fr); }
+    .four-col { grid-template-columns: repeat(4, 1fr); }
+    .stack { display: grid; gap: 28px; }
+    .tight { gap: 18px; }
+    .panel {
+      border-top: 1px solid var(--border-dark);
+      padding-top: 24px;
+    }
+    .light .panel { border-top-color: var(--border-light); }
+    .panel.full {
+      border: 1px solid var(--border-dark);
+      padding: 30px;
+    }
+    .light .panel.full { border-color: var(--border-light); }
+    .panel h3, .card-title {
+      font-size: 34px;
+      line-height: 1.18;
+      margin-bottom: 14px;
+    }
+    .panel p, .panel li, .card-body {
+      font-size: 22px;
+      line-height: 1.48;
+      color: var(--text-muted-dark);
+    }
+    .light .panel p, .light .panel li, .light .card-body { color: var(--text-muted-light); }
+    .dash-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 14px;
+    }
+    .dash-list li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+    }
+    .dash-list li::before {
+      content: "—";
+      color: var(--gold);
+      font-family: var(--font-mono);
+    }
+    .tag {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 7px 12px 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-right: 10px;
+    }
+    .quote {
+      font-size: 64px;
+      line-height: 1.18;
+      max-width: 1340px;
+    }
+    .quote-small { font-size: 46px; line-height: 1.25; }
+
+    /* === DATA AND DIAGRAM COMPONENTS === */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 42px;
+    }
+    .stat-card {
+      border-top: 1px solid var(--border-dark);
+      padding-top: 28px;
+    }
+    .light .stat-card { border-top-color: var(--border-light); }
+    .stat-value {
+      font-size: 92px;
+      color: var(--gold);
+      line-height: 0.92;
+      margin-bottom: 14px;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-hint-dark);
+    }
+    .light .stat-label { color: var(--text-hint-light); }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      align-items: stretch;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .flow-step {
+      min-height: 170px;
+      border-top: 2px solid var(--gold);
+      padding: 26px 18px;
+      background: rgba(255,255,255,0.025);
+      position: relative;
+    }
+    .light .flow-step { background: rgba(28,38,68,0.035); }
+    .flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -19px;
+      top: 62px;
+      color: var(--gold);
+      font-family: var(--font-mono);
+      z-index: 2;
+    }
+    .flow-num {
+      font-family: var(--font-mono);
+      color: var(--gold);
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      margin-bottom: 18px;
+    }
+    .flow-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      line-height: 1.12;
+    }
+    .timeline {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      position: relative;
+      padding-left: 30px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 7px;
+      bottom: 8px;
+      width: 1px;
+      background: var(--border-dark);
+    }
+    .light .timeline::before { background: var(--border-light); }
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 140px;
+      gap: 24px;
+      align-items: start;
+      position: relative;
+      padding-bottom: 6px;
+    }
+    .timeline-row::before {
+      content: "";
+      position: absolute;
+      left: -30px;
+      top: 6px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+    .timeline-date, .mono {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .timeline-text {
+      font-size: 22px;
+      line-height: 1.42;
+      color: var(--text-muted-dark);
+    }
+    .light .timeline-text { color: var(--text-muted-light); }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 20px;
+      line-height: 1.34;
+    }
+    .table th {
+      font-family: var(--font-mono);
+      color: var(--gold);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 0 18px 14px 0;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .light .table th { border-bottom-color: var(--border-light); }
+    .table td {
+      padding: 16px 18px 16px 0;
+      border-bottom: 1px solid rgba(46,61,92,0.72);
+      color: var(--text-muted-dark);
+    }
+    .light .table td { border-bottom-color: var(--border-light); color: var(--text-muted-light); }
+    .table strong { color: inherit; font-weight: 500; }
+    .formula {
+      font-family: var(--font-display);
+      font-size: 34px;
+      color: var(--gold);
+      padding: 26px 0;
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .light .formula { border-color: var(--border-light); }
+    .formula-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 30px 0;
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .light .formula-row { border-color: var(--border-light); }
+    .formula-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: var(--gold);
+    }
+    .formula-item:first-child { border-right: 1px solid var(--border-dark); }
+    .light .formula-item:first-child { border-right-color: var(--border-light); }
+    .formula-name {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-hint-light);
+    }
+    .dark .formula-name { color: var(--text-hint-dark); }
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      line-height: 1.25;
+    }
+    .frac .num { padding: 0 14px 4px; border-bottom: 1.5px solid currentColor; }
+    .frac .den { padding-top: 4px; }
+    .formula-item sub {
+      font-size: 0.55em;
+      font-family: var(--font-mono);
+    }
+    .demo-callout {
+      border: 1px solid var(--gold);
+      padding: 28px 34px;
+      font-family: var(--font-mono);
+      color: var(--gold);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    .mini-map {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .mini-card {
+      border-top: 1px solid var(--border-dark);
+      padding-top: 20px;
+      min-height: 138px;
+    }
+    .light .mini-card { border-top-color: var(--border-light); }
+    .mini-card .card-title { font-size: 28px; }
+    .mini-card .card-body { font-size: 19px; line-height: 1.45; }
+    .large-number {
+      font-family: var(--font-display);
+      color: var(--gold);
+      font-size: 150px;
+      line-height: 0.9;
+    }
+
+    /* === NAVIGATION AND EDITING UI === */
+    .deck-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border: 1px solid rgba(200,168,112,0.42);
+      background: rgba(26,32,48,0.72);
+      color: var(--text-warm);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      backdrop-filter: blur(10px);
+    }
+    .deck-controls button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+    .progress-track {
+      width: 190px;
+      height: 1px;
+      background: rgba(226,220,208,0.22);
+    }
+    .progress-fill {
+      height: 1px;
+      width: 0;
+      background: var(--gold);
+      transition: width 0.35s var(--ease-slide);
+    }
+    .edit-hotzone {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 84px;
+      height: 84px;
+      z-index: 10000;
+      cursor: pointer;
+    }
+    .edit-toggle {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      opacity: 0;
+      pointer-events: none;
+      border: 1px solid rgba(200,168,112,0.6);
+      background: rgba(26,32,48,0.86);
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      z-index: 10001;
+      transition: opacity 0.3s ease;
+    }
+    .edit-toggle.show, .edit-toggle.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    [contenteditable="true"] {
+      outline: 1px dashed var(--gold);
+      outline-offset: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="deck-viewport" aria-label="alphaBT pitchdeck">
+    <main class="deck-stage" id="deckStage">
+
+      <!-- === SLIDE 01: COVER === -->
+      <section class="slide dark cover active visible" data-title="Cover">
+        <div>
+          <div class="kicker reveal d1">Internal strategy update / alphaBT</div>
+          <div class="gold-rule reveal d2"></div>
+          <h1 class="cover-title reveal d3" data-editable>alpha<em>BT</em></h1>
+          <p class="cover-subtitle reveal d4" data-editable>A quarterly equity strategy engine for long-only Indian portfolios.</p>
+        </div>
+        <div class="foot reveal d5"><span>ML stock selection / exits / reporting</span><span>June 2026</span></div>
+      </section>
+
+      <!-- === SLIDE 02: PROBLEM STATEMENT === -->
+      <section class="slide light" data-title="Problem">
+        <div class="chrome"><span>Problem Statement</span><span>02 / 18</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">Mandate</div>
+            <h2 class="section-title" data-editable>Build a long-only portfolio that <em>beats the index</em> and feels credible to PMS clients.</h2>
+          </div>
+          <div class="stat-grid reveal d2">
+            <div class="stat-card">
+              <div class="stat-value">01</div>
+              <div class="card-title">Performance</div>
+              <p class="card-body">Select stocks each quarter using ML probability scores and measure excess return against an index.</p>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">02</div>
+              <div class="card-title">Risk Control</div>
+              <p class="card-body">Make exits, drawdown, cash drag, and market regimes first-class parts of the simulation.</p>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">03</div>
+              <div class="card-title">Experience</div>
+              <p class="card-body">Give clients a clear explanation of what was bought, how it behaved, and why it exited.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: README.md</span><span>Portfolio goal</span></div>
+      </section>
+
+      <!-- === SLIDE 03: SYSTEM PIPELINE === -->
+      <section class="slide dark" data-title="Pipeline">
+        <div class="chrome"><span>System Shape</span><span>03 / 18</span></div>
+        <div class="body" style="gap: 30px;">
+          <div class="reveal d1">
+            <div class="kicker">Configuration to client-facing artifact</div>
+            <h2 class="section-title">The work is an <em>operating loop</em>, not just a backtest script.</h2>
+          </div>
+          <div class="flow reveal d2" style="margin-top: 0;">
+            <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Configuration</div></div>
+            <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">Stock Selection</div></div>
+            <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">TP / SL Trades</div></div>
+            <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Portfolio Simulation</div></div>
+            <div class="flow-step"><div class="flow-num">05</div><div class="flow-title">Excel Reports</div></div>
+            <div class="flow-step"><div class="flow-num">06</div><div class="flow-title">Dashboard</div></div>
+          </div>
+          <div class="two-col reveal d3">
+            <div class="panel">
+              <h3>Inputs</h3>
+              <ul class="dash-list">
+                <li>ML inference data with quarterly probability scores.</li>
+                <li>OHLCV price data and benchmark index history.</li>
+                <li>YAML strategy config, defaults, and tuning output.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>Outputs</h3>
+              <ul class="dash-list">
+                <li>Trade-level entry, TP, SL, exit date, and exit type.</li>
+                <li>Daily portfolio NAV and index comparison series.</li>
+                <li>Excel workbook and Streamlit drill-down dashboard.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: docs/getting-started/ARCHITECTURE.md</span><span>Pipeline</span></div>
+      </section>
+
+      <!-- === SLIDE 04: QUARTERLY MODEL POSITIONING === -->
+      <section class="slide dark" data-title="Quarterly positioning">
+        <div class="body" style="height: 900px; align-content:center;">
+          <div class="kicker reveal d1">Strategy posture</div>
+          <div class="gold-rule reveal d2"></div>
+          <h2 class="quote reveal d3" data-editable>This is not a race to parse filings in minutes. It is a bet that cross-sectional fundamentals still help rank the next quarter’s winners.</h2>
+          <p class="lead reveal d4" style="margin-top:38px;">The model runs after the result window, when complete data exists and entry prices already include the immediate market reaction.</p>
+        </div>
+      </section>
+
+      <!-- === SLIDE 05: SEBI ALIGNED QUARTERS === -->
+      <section class="slide light" data-title="Quarter timing">
+        <div class="chrome"><span>Quarterly Approach</span><span>05 / 18</span></div>
+        <div class="body two-col-wide">
+          <div class="reveal d1">
+            <div class="kicker">Timing convention</div>
+            <h2 class="section-title">alphaBT enters one day after the relevant <em>SEBI filing deadline</em>.</h2>
+            <p class="lead" style="margin-top:26px;">That keeps target creation, backtesting, and live inference aligned around the same post-result entry window.</p>
+          </div>
+          <div class="panel full reveal d2">
+            <table class="table">
+              <thead><tr><th>Code</th><th>Entry start</th><th>Exit</th><th>Reason</th></tr></thead>
+              <tbody>
+                <tr><td><code>YYYY02</code></td><td>Feb 15</td><td>May 30</td><td>After Q3 deadline</td></tr>
+                <tr><td><code>YYYY05</code></td><td>May 31</td><td>Aug 14</td><td>After Q4 deadline</td></tr>
+                <tr><td><code>YYYY08</code></td><td>Aug 15</td><td>Nov 14</td><td>After Q1 deadline</td></tr>
+                <tr><td><code>YYYY11</code></td><td>Nov 15</td><td>Feb 14</td><td>After Q2 deadline</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="foot"><span>Source: QUARTERLY_RESULTS_AND_SIGNAL_TIMING.md</span><span>Filing cycle</span></div>
+      </section>
+
+      <!-- === SLIDE 06: PRICED-IN OBJECTION === -->
+      <section class="slide dark" data-title="Priced-in question">
+        <div class="chrome"><span>Quarterly Approach</span><span>06 / 18</span></div>
+        <div class="body two-col">
+          <div class="stack reveal d1">
+            <div>
+              <div class="kicker">The concern</div>
+              <h2 class="section-title">By deadline day, some results are already <em>weeks old</em>.</h2>
+            </div>
+            <div class="timeline">
+              <div class="timeline-row"><div class="timeline-date">Step 1</div><div class="timeline-text">Company files results.</div><div class="mono">Public info</div></div>
+              <div class="timeline-row"><div class="timeline-date">Step 2</div><div class="timeline-text">Market reacts, often within hours.</div><div class="mono">Price adjusts</div></div>
+              <div class="timeline-row"><div class="timeline-date">Step 3</div><div class="timeline-text">We wait for full-universe completeness.</div><div class="mono">Deadline</div></div>
+              <div class="timeline-row"><div class="timeline-date">Step 4</div><div class="timeline-text">Inference and portfolio entry begin.</div><div class="mono">Trade</div></div>
+            </div>
+          </div>
+          <div class="panel full reveal d2">
+            <h3>Why the target still makes sense</h3>
+            <ul class="dash-list">
+              <li>The target starts from the post-result entry price.</li>
+              <li>The label excludes the immediate result-day reaction.</li>
+              <li>The model learns a relative ranking over the next quarter.</li>
+              <li>The hypothesis is residual structural signal, not private information.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="foot"><span>Source: QUARTERLY_RESULTS_AND_SIGNAL_TIMING.md</span><span>Priced-in risk</span></div>
+      </section>
+
+      <!-- === SLIDE 07: LABEL CONSTRUCTION === -->
+      <section class="slide light" data-title="Label engineering">
+        <div class="chrome"><span>Label Engineering</span><span>07 / 18</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">Training objective</div>
+            <h2 class="section-title">Labels are built from forward performance <em>after entry</em>, ranked within each quarter.</h2>
+          </div>
+          <div class="flow reveal d2" style="grid-template-columns: repeat(5,1fr);">
+            <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Entry avg close, first 3 trading days</div></div>
+            <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">Compute high5 and close5</div></div>
+            <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">Convert to upside metrics</div></div>
+            <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Rank stocks within quarter</div></div>
+            <div class="flow-step"><div class="flow-num">05</div><div class="flow-title">Binary top 40 or top 20 label</div></div>
+          </div>
+          <div class="formula-row reveal d3">
+            <div class="formula-item">
+              <span class="formula-name">Upside / High</span>
+              <span class="frac"><span class="num">high<sub>5</sub> − entry</span><span class="den">entry</span></span>
+            </div>
+            <div class="formula-item">
+              <span class="formula-name">Upside / Close</span>
+              <span class="frac"><span class="num">close<sub>5</sub> − entry</span><span class="den">entry</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: MODEL_TRAINING_TARGETS.md</span><span>Target creation</span></div>
+      </section>
+
+      <!-- === SLIDE 08: SIX TARGETS === -->
+      <section class="slide light" data-title="Six targets">
+        <div class="chrome"><span>Label Engineering</span><span>08 / 18</span></div>
+        <div class="body two-col">
+          <div class="panel full reveal d1">
+            <h3>Six targets, one ranking idea</h3>
+            <table class="table">
+              <thead><tr><th>Target</th><th>Metric</th><th>Cutoff</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td><code>(high5-entry)/entry</code></td><td>Top 40%</td></tr>
+                <tr><td>2</td><td><code>(close5-entry)/entry</code></td><td>Top 40%</td></tr>
+                <tr><td>3</td><td><code>(high5-entry)/entry</code></td><td>Top 20%</td></tr>
+                <tr><td>4</td><td><code>(close5-entry)/entry</code></td><td>Top 20%</td></tr>
+                <tr><td>5</td><td><code>sharpe_high</code></td><td>Top 20%</td></tr>
+                <tr><td>6</td><td><code>sharpe_close</code></td><td>Top 20%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="stack reveal d2">
+            <div class="panel">
+              <h3>High5</h3>
+              <p>Captures intraday spikes. Natural for take-profit limit orders, but more optimistic and noisier.</p>
+            </div>
+            <div class="panel">
+              <h3>Close5</h3>
+              <p>Captures sustained buying pressure. More conservative and better aligned with EOD realism.</p>
+            </div>
+            <div class="panel">
+              <h3>Sharpe variants</h3>
+              <p>Reward upside while penalizing volatility, shifting the objective toward risk-adjusted winners.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: MODEL_TRAINING_TARGETS.md</span><span>Six labels</span></div>
+      </section>
+
+      <!-- === SLIDE 09: EXIT STRATEGY IMPORTANCE === -->
+      <section class="slide dark" data-title="Exit importance">
+        <div class="chrome"><span>Exit Strategy</span><span>09 / 18</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">Quarterly signal, daily risk</div>
+            <h2 class="section-title">A quarterly model decides what to own. Exits decide <em>how the quarter is survived</em>.</h2>
+          </div>
+          <div class="four-col reveal d2" style="gap: 42px;">
+            <div class="stat-card"><div class="stat-value">TP</div><div class="card-title">Take profit</div><p class="card-body">Lock gains when a stock reaches planned upside.</p></div>
+            <div class="stat-card"><div class="stat-value">SL</div><div class="card-title">Stop loss</div><p class="card-body">Cut failed ideas before they dominate the quarter.</p></div>
+            <div class="stat-card"><div class="stat-value">IX</div><div class="card-title">Regime exit</div><p class="card-body">Use index stress as a portfolio-wide risk signal.</p></div>
+            <div class="stat-card"><div class="stat-value">T</div><div class="card-title">Time exit</div><p class="card-body">Refresh at the next result-filing cycle.</p></div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: TPSL_MODULE.md</span><span>Trade lifecycle</span></div>
+      </section>
+
+      <!-- === SLIDE 10: TP/SL ENGINE === -->
+      <section class="slide light" data-title="TP SL engine">
+        <div class="chrome"><span>Exit Strategy</span><span>10 / 18</span></div>
+        <div class="body two-col-wide">
+          <div class="stack reveal d1">
+            <div>
+              <div class="kicker">Trade lifecycle</div>
+              <h2 class="section-title">Every position passes through the same execution engine.</h2>
+            </div>
+            <div class="timeline">
+              <div class="timeline-row"><div class="timeline-date">Entry</div><div class="timeline-text">Average close over first N trading days.</div><div class="mono">Default 3</div></div>
+              <div class="timeline-row"><div class="timeline-date">Levels</div><div class="timeline-text">Compute TP and SL independently.</div><div class="mono">Mode-based</div></div>
+              <div class="timeline-row"><div class="timeline-date">Monitor</div><div class="timeline-text">Daily intraday high/low and index regime checks.</div><div class="mono">Daily</div></div>
+              <div class="timeline-row"><div class="timeline-date">Exit</div><div class="timeline-text">SL, TP, regime, or mandatory quarter-end exit.</div><div class="mono">Ordered</div></div>
+            </div>
+          </div>
+          <div class="mini-map reveal d2">
+            <div class="mini-card"><div class="card-title">Tiered</div><p class="card-body">Static percentages by category.</p></div>
+            <div class="mini-card"><div class="card-title">Flat</div><p class="card-body">Same threshold across all stocks.</p></div>
+            <div class="mini-card"><div class="card-title">ATR</div><p class="card-body">Dynamic levels based on recent volatility.</p></div>
+            <div class="mini-card"><div class="card-title">Pivot</div><p class="card-body">Support/resistance based thresholds.</p></div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: TPSL_MODULE.md</span><span>Modes</span></div>
+      </section>
+
+      <!-- === SLIDE 11: SEARCH SPACE PROBLEM === -->
+      <section class="slide dark" data-title="Search space">
+        <div class="chrome"><span>Tuning</span><span>11 / 18</span></div>
+        <div class="body two-col-wide">
+          <div class="reveal d1">
+            <div class="kicker">The combinatorial problem</div>
+            <div class="large-number">9.8M</div>
+            <p class="lead" style="margin-top:28px;">Manual combinations from only five choices across ten parameters. Real strategies quickly exceed that.</p>
+          </div>
+          <div class="stack reveal d2">
+            <div class="panel">
+              <h3>Selection levers</h3>
+              <p>Top-k, category counts, weighting schemes, probability thresholds, sorting choices.</p>
+            </div>
+            <div class="panel">
+              <h3>Exit levers</h3>
+              <p>Flat, tiered, ATR, pivot, independent TP/SL modes and mode-specific parameters.</p>
+            </div>
+            <div class="panel">
+              <h3>Market levers</h3>
+              <p>Index moving averages, regime thresholds, volatility adjustments, risk-free cash behavior.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: TUNING_GUIDE.md</span><span>Parameter space</span></div>
+      </section>
+
+      <!-- === SLIDE 12: OPTUNA WORKFLOW === -->
+      <section class="slide light" data-title="Optuna workflow">
+        <div class="chrome"><span>Tuning</span><span>12 / 18</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">Efficient search</div>
+            <h2 class="section-title">Optuna turns millions of possibilities into <em>100–500 informed trials</em>.</h2>
+          </div>
+          <div class="flow reveal d2">
+            <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Define search space</div></div>
+            <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">Choose objective</div></div>
+            <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">Sample trials</div></div>
+            <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Analyze dashboard</div></div>
+            <div class="flow-step"><div class="flow-num">05</div><div class="flow-title">Export config</div></div>
+            <div class="flow-step"><div class="flow-num">06</div><div class="flow-title">Final report</div></div>
+          </div>
+          <div class="two-col reveal d3">
+            <div class="panel"><h3>Single objective</h3><p>Calmar ratio is a compact growth-per-drawdown metric for balanced optimization.</p></div>
+            <div class="panel"><h3>Multi objective</h3><p>CAGR and MDD as separate objectives expose the Pareto frontier for stakeholder judgment.</p></div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: TUNING_GUIDE.md</span><span>Optimization loop</span></div>
+      </section>
+
+      <!-- === SLIDE 13: ROBUST EXIT TUNING === -->
+      <section class="slide dark" data-title="Robustness">
+        <div class="chrome"><span>Tuning</span><span>13 / 18</span></div>
+        <div class="body two-col">
+          <div class="reveal d1">
+            <div class="kicker">Avoid optimizer bias</div>
+            <h2 class="section-title">Do not blindly trust the single best trial.</h2>
+            <p class="lead" style="margin-top:26px;">A three-parameter exit strategy has lower overfitting capacity than an ML model, but optimizer bias still exists.</p>
+          </div>
+          <div class="timeline reveal d2">
+            <div class="timeline-row"><div class="timeline-date">01</div><div class="timeline-text">Full-window multi-objective optimization to map the landscape.</div><div class="mono">Discovery</div></div>
+            <div class="timeline-row"><div class="timeline-date">02</div><div class="timeline-text">Inspect top Pareto trials for clustering and dispersion.</div><div class="mono">Stability</div></div>
+            <div class="timeline-row"><div class="timeline-date">03</div><div class="timeline-text">Evaluate candidate configs across temporal sub-periods.</div><div class="mono">Robustness</div></div>
+            <div class="timeline-row"><div class="timeline-date">04</div><div class="timeline-text">Adopt consensus parameters, then re-evaluate annually.</div><div class="mono">Deployment</div></div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: EXIT_STRATEGY_TUNING_METHODOLOGY.md</span><span>Robustness</span></div>
+      </section>
+
+      <!-- === SLIDE 14: EXCEL REPORTS === -->
+      <section class="slide light" data-title="Excel reports">
+        <div class="chrome"><span>Reporting</span><span>14 / 18</span></div>
+        <div class="body two-col">
+          <div class="reveal d1">
+            <div class="kicker">Institutional artifact</div>
+            <h2 class="section-title">The Excel workbook makes the backtest auditable.</h2>
+            <p class="lead" style="margin-top:26px;">Up to 17 sheets consolidate headline metrics, benchmark comparison, rolling returns, regime analysis, raw trades, daily NAV, and data-quality issues.</p>
+            <div class="demo-callout" style="margin-top:42px;">Live demo: open backtest_report.xlsx</div>
+          </div>
+          <div class="mini-map reveal d2">
+            <div class="mini-card"><div class="card-title">Metrics</div><p class="card-body">CAGR, volatility, Sharpe, Sortino, max drawdown, Calmar, VaR.</p></div>
+            <div class="mini-card"><div class="card-title">Benchmark</div><p class="card-body">Alpha, beta, tracking error, information ratio, capture ratios.</p></div>
+            <div class="mini-card"><div class="card-title">Regimes</div><p class="card-body">Crisis windows, bull/bear/recovery periods, quarterly alpha.</p></div>
+            <div class="mini-card"><div class="card-title">Audit</div><p class="card-body">Trade results, daily portfolio values, portfolio-vs-index series.</p></div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: REPORT_SHEETS.md</span><span>17 sheets</span></div>
+      </section>
+
+      <!-- === SLIDE 15: DASHBOARD === -->
+      <section class="slide dark" data-title="Dashboard">
+        <div class="chrome"><span>Dashboard</span><span>15 / 18</span></div>
+        <div class="body two-col-wide">
+          <div class="stack reveal d1">
+            <div>
+              <div class="kicker">Interactive drill-down</div>
+              <h2 class="section-title">The dashboard answers the next question in the room.</h2>
+            </div>
+            <div class="demo-callout">Live demo: open Streamlit dashboard</div>
+          </div>
+          <div class="mini-map reveal d2">
+            <div class="mini-card"><div class="card-title">Per Quarter</div><p class="card-body">Portfolio vs index, cash, trade outcomes, sector allocation.</p></div>
+            <div class="mini-card"><div class="card-title">Since Inception</div><p class="card-body">Equity curve, drawdown, rolling returns, monthly heatmap.</p></div>
+            <div class="mini-card"><div class="card-title">Stock Drill-Down</div><p class="card-body">Candlestick chart with entry, exit, TP, SL, and metadata.</p></div>
+            <div class="mini-card"><div class="card-title">Live Quarter</div><p class="card-body">Works with `get_portfolio --with-levels` and open positions.</p></div>
+          </div>
+        </div>
+        <div class="foot"><span>Source: src/visualization/dashboard.py</span><span>Plotly + Streamlit</span></div>
+      </section>
+
+      <!-- === SLIDE 16: OPERATING LOOP === -->
+      <section class="slide light" data-title="Operating loop">
+        <div class="chrome"><span>What this adds up to</span><span>16 / 18</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">End to end</div>
+            <h2 class="section-title">The system closes the loop from <em>signal</em> to client-facing explanation.</h2>
+          </div>
+          <div class="flow reveal d2">
+            <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">ML signal</div></div>
+            <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">Portfolio construction</div></div>
+            <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">Exit strategy</div></div>
+            <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Search and robustness</div></div>
+            <div class="flow-step"><div class="flow-num">05</div><div class="flow-title">Excel artifact</div></div>
+            <div class="flow-step"><div class="flow-num">06</div><div class="flow-title">PMS UX</div></div>
+          </div>
+          <p class="lead reveal d3" style="max-width:1320px;">The backtest is the core, but the surrounding machinery makes it usable: reproducible configs, deliberate labels, explainable exits, efficient tuning, and polished reporting.</p>
+        </div>
+        <div class="foot"><span>alphaBT</span><span>Operating model</span></div>
+      </section>
+
+      <!-- === SLIDE 17: NEXT QUESTIONS === -->
+      <section class="slide dark" data-title="Next questions">
+        <div class="chrome"><span>Next</span><span>17 / 18</span></div>
+        <div class="body three-col">
+          <div class="stat-card reveal d1">
+            <div class="stat-value">01</div>
+            <div class="card-title">Research</div>
+            <p class="card-body">Test rolling-entry alternatives and information decay around result dates.</p>
+          </div>
+          <div class="stat-card reveal d2">
+            <div class="stat-value">02</div>
+            <div class="card-title">Production</div>
+            <p class="card-body">Lock strategy configs, publish run artifacts, and monitor live quarters without parameter whipsaw.</p>
+          </div>
+          <div class="stat-card reveal d3">
+            <div class="stat-value">03</div>
+            <div class="card-title">Storytelling</div>
+            <p class="card-body">Turn every rebalance and exit into a clear PMS-facing explanation.</p>
+          </div>
+        </div>
+        <div class="foot"><span>Future work</span><span>Research / production / UX</span></div>
+      </section>
+
+      <!-- === SLIDE 18: CLOSE === -->
+      <section class="slide dark cover" data-title="Close">
+        <div>
+          <div class="kicker reveal d1">Questions</div>
+          <div class="gold-rule reveal d2"></div>
+          <h2 class="cover-title reveal d3" style="font-size:150px;" data-editable>From backtest to <em>operating discipline</em>.</h2>
+        </div>
+        <div class="foot reveal d4"><span>alphaBT</span><span>Quarterly equity strategy engine</span></div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="deck-controls" aria-label="Presentation controls">
+    <button id="prevBtn" type="button" aria-label="Previous slide">‹</button>
+    <span id="slideCounter">01 / 18</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <button id="nextBtn" type="button" aria-label="Next slide">›</button>
+  </div>
+  <div class="edit-hotzone" title="Edit mode"></div>
+  <button class="edit-toggle" id="editToggle" type="button">Edit</button>
+
+  <script>
+    /* === PRESENTATION CONTROLLER: scaling, navigation, progress === */
+    class SlidePresentation {
+      constructor() {
+        this.slides = Array.from(document.querySelectorAll(".slide"));
+        this.currentSlide = 0;
+        this.stage = document.getElementById("deckStage");
+        this.counter = document.getElementById("slideCounter");
+        this.progress = document.getElementById("progressFill");
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        document.getElementById("prevBtn").addEventListener("click", () => this.prev());
+        document.getElementById("nextBtn").addEventListener("click", () => this.next());
+        const requested = this.slideIndexFromHash();
+        this.showSlide(requested);
+        window.addEventListener("hashchange", () => this.showSlide(this.slideIndexFromHash()));
+      }
+
+      setupStageScale() {
+        const scale = () => {
+          const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+          const x = (window.innerWidth - 1920 * factor) / 2;
+          const y = (window.innerHeight - 1080 * factor) / 2;
+          this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+        };
+        scale();
+        window.addEventListener("resize", scale);
+      }
+
+      setupKeyboardNav() {
+        document.addEventListener("keydown", (event) => {
+          if (event.target && event.target.getAttribute("contenteditable") === "true") return;
+          const forward = ["ArrowRight", "ArrowDown", " ", "PageDown"];
+          const back = ["ArrowLeft", "ArrowUp", "PageUp"];
+          if (forward.includes(event.key)) { event.preventDefault(); this.next(); }
+          if (back.includes(event.key)) { event.preventDefault(); this.prev(); }
+          if (event.key === "Home") { event.preventDefault(); this.showSlide(0); }
+          if (event.key === "End") { event.preventDefault(); this.showSlide(this.slides.length - 1); }
+        });
+      }
+
+      setupTouchNav() {
+        let startX = 0;
+        let startY = 0;
+        window.addEventListener("touchstart", (event) => {
+          startX = event.touches[0].clientX;
+          startY = event.touches[0].clientY;
+        }, { passive: true });
+        window.addEventListener("touchend", (event) => {
+          const dx = event.changedTouches[0].clientX - startX;
+          const dy = event.changedTouches[0].clientY - startY;
+          if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy)) {
+            dx < 0 ? this.next() : this.prev();
+          }
+        }, { passive: true });
+      }
+
+      setupWheelNav() {
+        let lastWheel = 0;
+        window.addEventListener("wheel", (event) => {
+          const now = Date.now();
+          if (now - lastWheel < 620) return;
+          if (Math.abs(event.deltaY) > 30) {
+            event.deltaY > 0 ? this.next() : this.prev();
+            lastWheel = now;
+          }
+        }, { passive: true });
+      }
+
+      next() { this.showSlide(this.currentSlide + 1); }
+      prev() { this.showSlide(this.currentSlide - 1); }
+
+      slideIndexFromHash() {
+        const match = window.location.hash.match(/slide-(\d+)/);
+        if (!match) return 0;
+        return Number.parseInt(match[1], 10) - 1;
+      }
+
+      showSlide(index) {
+        this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+        this.slides.forEach((slide, i) => {
+          slide.classList.toggle("active", i === this.currentSlide);
+          slide.classList.toggle("visible", i === this.currentSlide);
+        });
+        const current = String(this.currentSlide + 1).padStart(2, "0");
+        const total = String(this.slides.length).padStart(2, "0");
+        this.counter.textContent = `${current} / ${total}`;
+        this.progress.style.width = `${((this.currentSlide + 1) / this.slides.length) * 100}%`;
+        window.location.hash = `slide-${this.currentSlide + 1}`;
+      }
+    }
+
+    /* === INLINE EDITOR: local draft text edits === */
+    class InlineEditor {
+      constructor() {
+        this.isActive = false;
+        this.editables = Array.from(document.querySelectorAll("[data-editable]"));
+        this.key = "alphabt-html-pitchdeck-edits";
+        this.load();
+      }
+
+      toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.getElementById("editToggle").classList.toggle("active", this.isActive);
+        this.editables.forEach((el, index) => {
+          el.setAttribute("contenteditable", this.isActive ? "true" : "false");
+          if (this.isActive) {
+            el.addEventListener("input", () => this.save(), { once: false });
+            el.dataset.editIndex = String(index);
+          }
+        });
+      }
+
+      save() {
+        const data = this.editables.map(el => el.innerHTML);
+        localStorage.setItem(this.key, JSON.stringify(data));
+      }
+
+      load() {
+        try {
+          const raw = localStorage.getItem(this.key);
+          if (!raw) return;
+          const data = JSON.parse(raw);
+          this.editables.forEach((el, i) => {
+            if (typeof data[i] === "string") el.innerHTML = data[i];
+          });
+        } catch (_) {
+          localStorage.removeItem(this.key);
+        }
+      }
+    }
+
+    const deck = new SlidePresentation();
+    const editor = new InlineEditor();
+
+    /* === EDIT TOGGLE HOTZONE: hover, click, E key === */
+    const hotzone = document.querySelector(".edit-hotzone");
+    const editToggle = document.getElementById("editToggle");
+    let hideTimeout = null;
+    hotzone.addEventListener("mouseenter", () => {
+      clearTimeout(hideTimeout);
+      editToggle.classList.add("show");
+    });
+    hotzone.addEventListener("mouseleave", () => {
+      hideTimeout = setTimeout(() => {
+        if (!editor.isActive) editToggle.classList.remove("show");
+      }, 400);
+    });
+    editToggle.addEventListener("mouseenter", () => clearTimeout(hideTimeout));
+    editToggle.addEventListener("mouseleave", () => {
+      hideTimeout = setTimeout(() => {
+        if (!editor.isActive) editToggle.classList.remove("show");
+      }, 400);
+    });
+    hotzone.addEventListener("click", () => editor.toggleEditMode());
+    editToggle.addEventListener("click", () => editor.toggleEditMode());
+    document.addEventListener("keydown", (event) => {
+      if ((event.key === "e" || event.key === "E") && event.target.getAttribute("contenteditable") !== "true") {
+        editor.toggleEditMode();
+      }
+    });
+  </script>
+</body>
+</html>
