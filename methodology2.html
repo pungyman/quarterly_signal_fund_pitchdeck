@@ -731,7 +731,7 @@
     .rolling-slide .lead { font-size: 23px; }
     .rolling-slide .window-board {
       padding: 24px 32px 22px;
-      background: var(--cream);
+      background: #ffffff;
       border-color: var(--border-light);
     }
     .rolling-slide .legend {
@@ -845,104 +845,14 @@
         <div class="foot reveal d5"><span>ML stock selection / exits / reporting</span><span>June 2026</span></div>
       </section>
 
-      <!-- === SLIDE 02: PROBLEM STATEMENT === -->
-      <section class="slide light tight-slide" data-title="Problem">
-        <div class="chrome"><span>The Mandate</span><span>02 / 09</span></div>
+      <!-- === SLIDE 02: ROLLING WINDOW TRAINING (was slide 5) === -->
+      <section class="slide light tight-slide rolling-slide" data-title="Rolling Window Training">
+        <div class="chrome"><span>The Model</span><span>02 / 07</span></div>
         <div class="body">
           <div class="reveal d1">
-            <div class="kicker">Where we start</div>
-            <h2 class="section-title" data-editable>Build a long-only portfolio that <em>beats the index</em> and feels credible to clients.</h2>
-            <p class="lead" style="margin-top: 22px;">Three things have to be true at once, and the rest of this deck shows how each one is delivered.</p>
-          </div>
-          <div class="stat-grid reveal d2">
-            <div class="stat-card">
-              <div class="stat-value">01</div>
-              <div class="card-title">Performance</div>
-              <p class="card-body">Select stocks each quarter using ML probability scores and measure excess return against an index.</p>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value">02</div>
-              <div class="card-title">Risk Control</div>
-              <p class="card-body">Make exits, drawdown, cash drag, and risk behavior first-class parts of the simulation.</p>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value">03</div>
-              <div class="card-title">Experience</div>
-              <p class="card-body">Give clients a clear explanation of what was bought, how it behaved, and why it exited.</p>
-            </div>
-          </div>
-        </div>
-        <div class="foot"><span>Quarterly Signal Fund</span><span>Portfolio goal</span></div>
-      </section>
-
-      <!-- === SLIDE 03: OVERVIEW OF APPROACH === -->
-      <section class="slide dark tight-slide" data-title="Overview of Approach">
-        <div class="chrome"><span>The Approach</span><span>03 / 09</span></div>
-        <div class="body">
-          <div class="reveal d1">
-            <div class="kicker">From mandate to method</div>
-            <h2 class="section-title">One quarterly pipeline turns public filings into <em>risk-aware stock selection</em>.</h2>
-            <p class="lead" style="margin-top: 18px;">The stages below run in order every quarter; the next slides open up each one.</p>
-          </div>
-          <div class="flow reveal d2" style="margin-top: 0;">
-            <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Quarterly Filings</div></div>
-            <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">ML Signal</div></div>
-            <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">Volatility Scoring</div></div>
-            <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Portfolio</div></div>
-            <div class="flow-step"><div class="flow-num">05</div><div class="flow-title">ATR / S&amp;R Exit</div></div>
-          </div>
-          <div class="two-col reveal d3">
-            <div class="panel">
-              <h3>Operating Rules</h3>
-              <ul class="dash-list">
-                <li>ML models extract signal from quarterly results posted by NIFTY 500 companies.</li>
-                <li>Positions enter across a 3-day entry phase every quarter after SEBI filing deadlines.</li>
-                <li>Model scores combine with historical volatility to build portfolios that emphasize lower drawdowns.</li>
-                <li>Exit strategy uses take-profit and stop-loss rules to manage the quarter after entry.</li>
-              </ul>
-            </div>
-            <div class="innovation-card">
-              <h3>Key Innovation</h3>
-              <p>The model predicts <em>relative</em> outperformance versus the market, not absolute returns.</p>
-              <p style="margin-top: 18px;">That creates a fundamentals-for-entry, technicals-for-exit approach designed to limit downside.</p>
-            </div>
-          </div>
-        </div>
-        <div class="foot"><span>Quarterly Signal Fund</span><span>Approach</span></div>
-      </section>
-
-      <!-- === SLIDE 04: SEBI ALIGNED QUARTERS === -->
-      <section class="slide light" data-title="Quarter timing">
-        <div class="chrome"><span>Inside the Approach &middot; Entry</span><span>04 / 09</span></div>
-        <div class="body two-col-wide">
-          <div class="reveal d1">
-            <div class="kicker">First stage &middot; When we act</div>
-            <h2 class="section-title">It all starts with the filings: we enter one day after each <em>SEBI deadline</em>.</h2>
-            <p class="lead" style="margin-top:26px;">That keeps target creation, backtesting, and live inference aligned around the same post-result entry window.</p>
-          </div>
-          <div class="panel full reveal d2">
-            <table class="table">
-              <thead><tr><th>Code</th><th>Entry start</th><th>Exit</th><th>Reason</th></tr></thead>
-              <tbody>
-                <tr><td><code>YYYY02</code></td><td>Feb 15</td><td>May 30</td><td>After Q3 deadline</td></tr>
-                <tr><td><code>YYYY05</code></td><td>May 31</td><td>Aug 14</td><td>After Q4 deadline</td></tr>
-                <tr><td><code>YYYY08</code></td><td>Aug 15</td><td>Nov 14</td><td>After Q1 deadline</td></tr>
-                <tr><td><code>YYYY11</code></td><td>Nov 15</td><td>Feb 14</td><td>After Q2 deadline</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="foot"><span>Quarterly Signal Fund</span><span>Filing cycle</span></div>
-      </section>
-
-      <!-- === SLIDE 05: ROLLING WINDOW TRAINING === -->
-      <section class="slide dark tight-slide rolling-slide" data-title="Rolling Window Training">
-        <div class="chrome"><span>Inside the Approach &middot; The Model</span><span>05 / 09</span></div>
-        <div class="body">
-          <div class="reveal d1">
-            <div class="kicker">The ML signal &middot; How it is learned</div>
-            <h2 class="section-title">Behind that signal, a 10-year window slides forward <em>one prediction year at a time</em>.</h2>
-            <p class="lead" style="margin-top: 22px;">Each window trains only on history available before the prediction year, so there is no future leakage.</p>
+            <div class="kicker">How the signal is learned &middot; Adaptive by design</div>
+            <h2 class="section-title">An <em>adaptive</em> 10-year window slides forward <em>one prediction year at a time</em>.</h2>
+            <p class="lead" style="margin-top: 22px;">Retraining every year keeps the model dynamic - it continually adapts to changing market conditions, and each window trains only on history available before the prediction year, so there is no future leakage.</p>
           </div>
           <div class="window-board reveal d2">
             <div class="legend">
@@ -992,19 +902,19 @@
             </div>
           </div>
           <div class="innovation-card reveal d3">
-            <h3>Result</h3>
-            <p>Each window produces probability scores for every NIFTY 500 stock in the prediction year.</p>
+            <h3>Adaptive &amp; Dynamic</h3>
+            <p>Each window produces fresh probability scores for every NIFTY 500 stock, so the signal stays current as markets shift instead of being locked to one historical regime.</p>
           </div>
         </div>
-        <div class="foot"><span>Quarterly Signal Fund</span><span>Rolling window</span></div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Adaptive &middot; dynamic</span></div>
       </section>
 
-      <!-- === SLIDE 06: FEATURES USED TO EXTRACT SIGNAL === -->
-      <section class="slide light tight-slide feature-slide" data-title="Features used to Extract Signal">
-        <div class="chrome"><span>Inside the Approach &middot; Model Inputs</span><span>06 / 09</span></div>
+      <!-- === SLIDE 03: FEATURES USED TO EXTRACT SIGNAL (was slide 6) === -->
+      <section class="slide dark tight-slide feature-slide" data-title="Features used to Extract Signal">
+        <div class="chrome"><span>Model Inputs</span><span>03 / 07</span></div>
         <div class="body">
           <div class="reveal d1">
-            <div class="kicker">The ML signal &middot; What the model reads</div>
+            <div class="kicker">What the model reads</div>
             <h2 class="section-title">Inside each window, the model reads <em>these feature categories</em>.</h2>
             <p class="lead" style="margin-top: 22px;">Feature distribution across categories - quality, momentum, profitability, efficiency, growth, and volatility.</p>
           </div>
@@ -1015,9 +925,69 @@
         <div class="foot"><span>Quarterly Signal Fund</span><span>Feature set</span></div>
       </section>
 
-      <!-- === SLIDE 07: EXIT STRATEGY WITHOUT REGIME EXIT === -->
-      <section class="slide dark" data-title="Exit importance">
-        <div class="chrome"><span>Inside the Approach &middot; Exits</span><span>07 / 09</span></div>
+      <!-- === SLIDE 04: SEBI ALIGNED QUARTERS (was slide 4) === -->
+      <section class="slide light" data-title="Quarter timing">
+        <div class="chrome"><span>Entry Timing</span><span>04 / 07</span></div>
+        <div class="body two-col-wide">
+          <div class="reveal d1">
+            <div class="kicker">When we act</div>
+            <h2 class="section-title">We enter one day after each <em>SEBI filing deadline</em>.</h2>
+            <p class="lead" style="margin-top:26px;">That keeps target creation, backtesting, and live inference aligned around the same post-result entry window.</p>
+          </div>
+          <div class="panel full reveal d2">
+            <table class="table">
+              <thead><tr><th>Code</th><th>Entry start</th><th>Exit</th><th>Reason</th></tr></thead>
+              <tbody>
+                <tr><td><code>YYYY02</code></td><td>Feb 15</td><td>May 30</td><td>After Q3 deadline</td></tr>
+                <tr><td><code>YYYY05</code></td><td>May 31</td><td>Aug 14</td><td>After Q4 deadline</td></tr>
+                <tr><td><code>YYYY08</code></td><td>Aug 15</td><td>Nov 14</td><td>After Q1 deadline</td></tr>
+                <tr><td><code>YYYY11</code></td><td>Nov 15</td><td>Feb 14</td><td>After Q2 deadline</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Filing cycle</span></div>
+      </section>
+
+      <!-- === SLIDE 05: OVERVIEW OF APPROACH (was slide 3) === -->
+      <section class="slide dark tight-slide" data-title="Overview of Approach">
+        <div class="chrome"><span>The Approach</span><span>05 / 07</span></div>
+        <div class="body">
+          <div class="reveal d1">
+            <div class="kicker">How it all fits together</div>
+            <h2 class="section-title">One quarterly pipeline turns public filings into <em>risk-aware stock selection</em>.</h2>
+            <p class="lead" style="margin-top: 18px;">Signal, scoring, portfolio construction, and exits all run in order, every quarter.</p>
+          </div>
+          <div class="flow reveal d2" style="margin-top: 0;">
+            <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Quarterly Filings</div></div>
+            <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">ML Signal</div></div>
+            <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">Volatility Scoring</div></div>
+            <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Portfolio</div></div>
+            <div class="flow-step"><div class="flow-num">05</div><div class="flow-title">ATR / S&amp;R Exit</div></div>
+          </div>
+          <div class="two-col reveal d3">
+            <div class="panel">
+              <h3>Operating Rules</h3>
+              <ul class="dash-list">
+                <li>ML models extract signal from quarterly results posted by NIFTY 500 companies.</li>
+                <li>Positions enter across a 3-day entry phase every quarter after SEBI filing deadlines.</li>
+                <li>Model scores combine with historical volatility to build portfolios that emphasize lower drawdowns.</li>
+                <li>Exit strategy uses take-profit and stop-loss rules to manage the quarter after entry.</li>
+              </ul>
+            </div>
+            <div class="innovation-card">
+              <h3>Key Innovation</h3>
+              <p>The model predicts <em>relative</em> outperformance versus the market, not absolute returns.</p>
+              <p style="margin-top: 18px;">That creates a fundamentals-for-entry, technicals-for-exit approach designed to limit downside.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Quarterly Signal Fund</span><span>Approach</span></div>
+      </section>
+
+      <!-- === SLIDE 06: EXIT STRATEGY WITHOUT REGIME EXIT (was slide 7) === -->
+      <section class="slide light" data-title="Exit importance">
+        <div class="chrome"><span>Exits</span><span>06 / 07</span></div>
         <div class="body">
           <div class="reveal d1">
             <div class="kicker">After entry &middot; Managing the quarter</div>
@@ -1044,35 +1014,7 @@
         <div class="foot"><span>Quarterly Signal Fund</span><span>Trade lifecycle</span></div>
       </section>
 
-      <!-- === SLIDE 08: SEARCH SPACE PROBLEM === -->
-      <section class="slide light" data-title="Search space">
-        <div class="chrome"><span>Making It Robust &middot; Tuning</span><span>08 / 09</span></div>
-        <div class="body two-col-wide">
-          <div class="reveal d1">
-            <div class="kicker">Tying the pipeline together</div>
-            <div class="large-number" style="color: var(--navy);">9.8M</div>
-            <p class="lead" style="margin-top:28px;">Every stage above carries its own levers. Combined, they make a search space too large to tune by hand - even five choices across ten parameters reach millions.</p>
-            <div class="demo-callout" style="margin-top:30px;">It is therefore machine driven - an optimizer runs through the trials, with a human in the loop ensuring stability.</div>
-          </div>
-          <div class="stack reveal d2">
-            <div class="panel">
-              <h3>Selection levers</h3>
-              <p>Top-k, category counts, weighting schemes, probability thresholds, sorting choices.</p>
-            </div>
-            <div class="panel">
-              <h3>Exit levers</h3>
-              <p>Flat, tiered, ATR, pivot, independent TP/SL modes and mode-specific parameters.</p>
-            </div>
-            <div class="panel">
-              <h3>Market levers</h3>
-              <p>Index moving averages, risk thresholds, volatility adjustments, risk-free cash behavior.</p>
-            </div>
-          </div>
-        </div>
-        <div class="foot"><span>Quarterly Signal Fund</span><span>Parameter space</span></div>
-      </section>
-
-      <!-- === SLIDE 09: CLOSE === -->
+      <!-- === SLIDE 07: CLOSE === -->
       <section class="slide dark cover" data-title="Close">
         <div>
           <div class="kicker reveal d1">Thank you</div>
@@ -1088,7 +1030,7 @@
 
   <div class="deck-controls" aria-label="Presentation controls">
     <button id="prevBtn" type="button" aria-label="Previous slide">&lsaquo;</button>
-    <span id="slideCounter">01 / 09</span>
+    <span id="slideCounter">01 / 07</span>
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     <button id="nextBtn" type="button" aria-label="Next slide">&rsaquo;</button>
   </div>
@@ -1194,7 +1136,7 @@
       constructor() {
         this.isActive = false;
         this.editables = Array.from(document.querySelectorAll("[data-editable]"));
-        this.key = "qsf-methodology-html-pitchdeck-edits";
+        this.key = "qsf-methodology2-html-pitchdeck-edits";
         this.load();
       }
 

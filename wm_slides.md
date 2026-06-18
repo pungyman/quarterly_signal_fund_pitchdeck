@@ -22,6 +22,76 @@ lineNumbers: false
 layout: default
 ---
 
+# Model Training Methodology
+
+<p class="text-sm text-gray-500 mb-2">An adaptive 10-year window slides forward one prediction year at a time — retraining annually keeps the model dynamic and continually adapting to changing market conditions</p>
+
+<div class="mx-4 mt-1">
+  <div class="flex items-center gap-4 mb-3 ml-[52px] text-[0.7rem]">
+    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded-sm bg-[#303192]"></span> <span class="text-gray-500">Training Window (10 yrs)</span></span>
+    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded-sm bg-[#e85d75]"></span> <span class="text-gray-500">Prediction Year</span></span>
+  </div>
+
+  <div class="flex items-end gap-2 mb-1.5">
+    <div class="w-[48px] shrink-0"></div>
+    <div class="flex-1 relative h-5 border-b border-gray-200">
+      <span class="absolute bottom-0.5 text-[0.6rem] text-gray-400 -translate-x-1/2" style="left: 2.63%;">2007</span>
+      <span class="absolute bottom-0.5 text-[0.6rem] text-gray-400 -translate-x-1/2" style="left: 18.42%;">'10</span>
+      <span class="absolute bottom-0.5 text-[0.6rem] text-gray-400 -translate-x-1/2" style="left: 34.21%;">'13</span>
+      <span class="absolute bottom-0.5 text-[0.6rem] text-gray-400 -translate-x-1/2" style="left: 50%;">'16</span>
+      <span class="absolute bottom-0.5 text-[0.6rem] text-gray-400 -translate-x-1/2" style="left: 65.79%;">'19</span>
+      <span class="absolute bottom-0.5 text-[0.6rem] text-gray-400 -translate-x-1/2" style="left: 81.58%;">'22</span>
+      <span class="absolute bottom-0.5 text-[0.6rem] text-gray-400 -translate-x-1/2" style="left: 97.37%;">2025</span>
+    </div>
+  </div>
+
+  <div class="space-y-1">
+    <div class="flex items-center gap-2">
+      <div class="w-[48px] shrink-0 text-right text-[0.7rem] font-semibold text-[#303192] tabular-nums">Set 1</div>
+      <div class="flex-1 relative h-7">
+        <div class="absolute inset-y-0 rounded bg-[#303192] flex items-center justify-center" style="left: 0%; width: 52.63%;"><span class="text-white text-[0.65rem]">2007 – 2016</span></div>
+        <div class="absolute inset-y-0 rounded bg-[#e85d75] flex items-center justify-center" style="left: 52.63%; width: 5.26%;"><span class="text-white text-[0.5rem] font-bold">'17</span></div>
+      </div>
+    </div>
+    <div v-click class="flex items-center gap-2">
+      <div class="w-[48px] shrink-0 text-right text-[0.7rem] font-semibold text-[#303192] tabular-nums">Set 2</div>
+      <div class="flex-1 relative h-7">
+        <div class="absolute inset-y-0 rounded bg-[#303192] flex items-center justify-center" style="left: 5.26%; width: 52.63%;"><span class="text-white text-[0.65rem]">2008 – 2017</span></div>
+        <div class="absolute inset-y-0 rounded bg-[#e85d75] flex items-center justify-center" style="left: 57.89%; width: 5.26%;"><span class="text-white text-[0.5rem] font-bold">'18</span></div>
+      </div>
+    </div>
+    <div v-click class="flex items-center gap-2">
+      <div class="w-[48px] shrink-0 text-right text-[0.7rem] font-semibold text-[#303192] tabular-nums">Set 3</div>
+      <div class="flex-1 relative h-7">
+        <div class="absolute inset-y-0 rounded bg-[#303192] flex items-center justify-center" style="left: 10.53%; width: 52.63%;"><span class="text-white text-[0.65rem]">2009 – 2018</span></div>
+        <div class="absolute inset-y-0 rounded bg-[#e85d75] flex items-center justify-center" style="left: 63.16%; width: 5.26%;"><span class="text-white text-[0.5rem] font-bold">'19</span></div>
+      </div>
+    </div>
+    <div v-click>
+      <div class="flex items-center gap-2 h-5">
+        <div class="w-[48px] shrink-0"></div>
+        <div class="flex-1 text-center text-gray-400 text-sm tracking-[0.3em]">···</div>
+      </div>
+      <div class="flex items-center gap-2 mt-1">
+        <div class="w-[48px] shrink-0 text-right text-[0.7rem] font-semibold text-[#303192] tabular-nums">Set 9</div>
+        <div class="flex-1 relative h-7">
+          <div class="absolute inset-y-0 rounded bg-[#303192] flex items-center justify-center" style="left: 42.11%; width: 52.63%;"><span class="text-white text-[0.65rem]">2015 – 2024</span></div>
+          <div class="absolute inset-y-0 rounded bg-[#e85d75] flex items-center justify-center" style="left: 94.74%; width: 5.26%;"><span class="text-white text-[0.5rem] font-bold">'25</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div v-click class="mx-4 mt-8 p-3 rounded-xl bg-[#303192]/8 border border-[#303192]/15">
+<span class="font-bold text-[#303192]">Adaptive &amp; Dynamic</span>
+<span class="text-[0.85rem] ml-2">Each window produces fresh probability scores for every NIFTY 500 stock, so the signal stays current as markets shift instead of being locked to one historical regime.</span>
+</div>
+
+---
+layout: default
+---
+
 # Portfolio Concentration Variants
 
 <p class="text-sm text-gray-500 mb-2">One signal engine, four levels of portfolio breadth — choose your risk / return profile</p>
@@ -66,6 +136,8 @@ The ML model predicts <span class="font-bold not-italic text-[#303192]">relative
 Combined with a  <span class="font-bold not-italic text-[#303192]">fundamentals-for-entry</span>, <span class="font-bold not-italic text-[#303192]">technicals-for-exit</span> approach to limit downside.
 </div>
 </div>
+
+<div class="mt-3 text-left text-[0.7rem] text-gray-400"><span class="font-semibold">Note:</span> CAGR figures correspond to period 2017–2026</div>
 
 ---
 layout: default
@@ -433,6 +505,34 @@ layout: default
 
 <div class="flex justify-center items-center h-[75%] mt-8">
   <img src="/images/wm20_monthly.png" class="max-h-[400px] rounded-lg shadow-lg" />
+</div>
+
+---
+layout: default
+---
+
+# Implementation Notes
+
+<div class="h-[76%] flex flex-col justify-center gap-5">
+  <div class="p-5 rounded-xl bg-[#303192]/8 border border-[#303192]/15">
+    <div class="text-sm uppercase tracking-[0.2em] text-[#303192]/70 font-bold mb-3">7-Stock Portfolio</div>
+    <div class="grid grid-cols-2 gap-5">
+      <div>
+        <div class="text-xl font-bold text-[#303192] mb-2">Churned Twice Every Quarter</div>
+        <div class="text-gray-600">The concentrated 7-stock portfolio is churned twice every quarter to keep the holding set aligned with the latest signal output.</div>
+      </div>
+      <div>
+        <div class="text-xl font-bold text-[#303192] mb-2">Aggressive TP / SL Discipline</div>
+        <div class="text-gray-600">Aggressive target-profit and stop-loss rules are used as active risk-management controls to limit downside.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-5 rounded-xl bg-white border border-[#303192]/15 shadow-sm">
+    <div class="text-sm uppercase tracking-[0.2em] text-[#303192]/70 font-bold mb-2">All Strategies</div>
+    <div class="text-xl font-bold text-[#303192] mb-2">Cash Deployment Assumption</div>
+    <div class="text-gray-600">Cash held after exiting positions is assumed to be invested in a liquid instrument, such as Liquid BeES, until it is redeployed into new signals.</div>
+  </div>
 </div>
 
 ---
